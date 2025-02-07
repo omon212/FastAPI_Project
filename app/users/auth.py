@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, Request, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -14,7 +14,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
 auth_router = APIRouter()
 
 
@@ -38,3 +37,12 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
         return user
     except JWTError:
         return None
+
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if datetime.utcnow() > datetime.utcfromtimestamp(payload["exp"]):
+            raise HTTPException(status_code=401, detail="Token expired")
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")

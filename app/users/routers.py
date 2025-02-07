@@ -6,7 +6,7 @@ from app.users.models import User
 from app.users.auth import create_access_token, get_current_user
 from fastapi.responses import Response
 from app.users.schemas import UserSchema
-
+from app.users.auth import verify_token,oauth2_scheme
 auth = APIRouter(prefix="/auth",tags=["Auth"])
 
 
@@ -34,11 +34,9 @@ async def user_login(user: UserSchema, db: Session = Depends(get_db)):
     return {"message": "User Login Succesfuly", "access_token": access_token, "token_type": "bearer"}
 
 
-@auth.get("/me")
-async def user_current(current_user: User = Depends(get_current_user)):
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    return current_user.username
+@auth.get("/auth/me")
+def read_users_me(token: str = Depends(oauth2_scheme)):
+    return verify_token(token)
 
 
 @auth.get("/logout")
