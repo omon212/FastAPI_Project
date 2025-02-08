@@ -26,7 +26,6 @@ async def user_register(user: UserSchema, db: Session = Depends(get_db)):
 
 @auth.post("/login", status_code=200)
 async def user_login(user: UserSchema, db: Session = Depends(get_db)):
-
     existing_user = db.query(User).filter(User.username == user.username).first()
     if not existing_user:
         return {"message": "User Not Found"}
@@ -43,6 +42,12 @@ def read_users_me(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     return verify_token(token)
+
+
+@auth.get("/users")
+def read_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return users
 
 
 @auth.post("/logout", status_code=200)
