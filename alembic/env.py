@@ -1,19 +1,23 @@
+import os
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
+from app.config import DB_URL
 
-# Modellarni chaqiramiz
 from app.tasks.models import Task
 from app.users.models import User
-from app.databace import Base  # Barcha modellarning `Base` obyektini olish
+from app.databace import Base
 
 config = context.config
+
+if DB_URL:
+    config.set_main_option("sqlalchemy.url", DB_URL)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Barcha modellarning metadata obyektini qo‘shamiz
 target_metadata = Base.metadata
+
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode."""
