@@ -15,7 +15,7 @@ def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
-        title="My API",
+        title="FastAPI",
         version="1.0.0",
         description="This is an API with Bearer authentication",
         routes=app.routes,

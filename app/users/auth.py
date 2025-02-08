@@ -16,6 +16,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 auth_router = APIRouter()
 
+blacklisted_tokens = set()
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -46,3 +47,7 @@ def verify_token(token: str):
         return payload
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+def revoke_access_token(token: str):
+    blacklisted_tokens.add(token)
