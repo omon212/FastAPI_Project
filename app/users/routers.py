@@ -47,7 +47,7 @@ def read_users_me(token: str = Depends(oauth2_scheme)):
 @auth.get("/users")
 def read_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
-    return users
+    return [{"id": user.id, "username": user.username, "password": user.password} for user in users]
 
 
 @auth.post("/logout", status_code=200)
